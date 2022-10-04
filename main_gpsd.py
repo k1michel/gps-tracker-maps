@@ -70,7 +70,7 @@ print('\nMIS DATOS\n')
 lat,lon = packet.position()
 print(f'Latitud: {lat} \nLongitud: {lon}')
 
-gmaps = googlemaps.Client(key='AIzaSyBO0ANxvR-lOtZKoFE5LDe1tbqRjVeple4')
+gmaps = googlemaps.Client(key='-')
 
 # Geocoding an address
 geocode_result = gmaps.geocode('Localizacion, MiDispositivoGPS')
