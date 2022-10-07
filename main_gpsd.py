@@ -69,46 +69,28 @@ def get_envios():
     print("DISPOSITIVO: " + str(gpsd.device()))
 
     print('\n ##########  MIS DATOS  #########')
-    lat,lon = packet.position()
-    print(f'Latitud: {lat} \nLongitud: {lon}')
+    if packet.mode >=2:
+        lat,lon = packet.position()
+        fecha = packet.time
+        fecha_compuesta = fecha.split('T')
+        fecha_ok = fecha_compuesta[0]
+        hora_ok = fecha_compuesta[1]    
 
-    url_map = str(packet.map_url())
-    envio= dict(
-        latitud = lat,
-        longitud = lon,
-        url = url_map,
+        url_map = str(packet.map_url())
+        envio= dict(
+            n_satelites = str(packet.sats),
+            fecha = fecha_ok,
+            hora = hora_ok,
+            velocidad_h = packet.hspeed,
+            velocidad_v = packet.speed(),
+            latitud = lat,
+            longitud = lon,
+            altitud = packet.alt,
+            url = url_map,
 
-    )
-    return envio
-#webbrowser.open(url_map)
+        )
+        return envio
 
-
-
-### TOM TOM ###
-'''
-#locations = str(round(lat,5)) + ',' + str(round(lon,5)) + ':' + str(round(lat+10,5)) + ',' + str(round(lon+10,5))
-#post_tomtom=requests.get(f'https://api.tomtom.com/routing/1/calculateRoute/{locations}/json?key=0RIbAqPHzVq7IyARS5U9Uig03lOGtRoS')
-post_tomtom=requests.get(f'https://api.tomtom.com/map/1/staticimage?key=0RIbAqPHzVq7IyARS5U9Uig03lOGtRoS&zoom=15&center={lon},{lat}&format=png&layer=basic&style=main&width=300&height=200&view=Unified&language=es-ES').content
-with open(f'mapa_{packet.time}.png','wb') as down_img:
-    down_img.write(post_tomtom)
-'''
-
-### GOOGLE MAPS ###
-'''
-gmaps = googlemaps.Client(key='-')
-
-# Geocoding an address
-geocode_result = gmaps.geocode('Localizacion, MiDispositivoGPS')
-
-# Look up an address with reverse geocoding
-
-
-reverse_geocode_result = gmaps.reverse_geocode((lat, lon))
-
-# Request directions via public transit
-now = datetime.now()
-directions_result = gmaps.directions("GPS", "Lugar, Pais", mode="transit", departure_time=now)
-'''
 
 if __name__ == '__main__':
     uvicorn.run(api_gpsd, host="0.0.0.0", port=8000)
